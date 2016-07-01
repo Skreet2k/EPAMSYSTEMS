@@ -19,10 +19,10 @@ namespace Kharkovskiy_Alexander_Task2
             _file.EndWrite += FileEndWrite;
             InputFilePath = inputFilePath;
             OutputFilePath = outputFilePath;
-            ProcesData();
+            ProcessData();
         }
 
-        private delegate int Sum(string s); //todo: Rename idk how
+        private delegate int ProcessDataDelegate(string s); //todo: Rename idk how
         private static int SumOfDigit(string s)
         {
             var sumOfDigit = 0;
@@ -46,12 +46,12 @@ namespace Kharkovskiy_Alexander_Task2
             return s.Length;
         }
 
-        private static int SumMethod(Sum sum, string s)
+        private static int SumMethod(ProcessDataDelegate processDataDelegate, string s)
         {
-            return sum(s);
+            return processDataDelegate(s);
         }
 
-        private void ProcesData()
+        private void ProcessData()
         {
             var list = _file.ReadToList(InputFilePath, Spliter);
             foreach (var item in list)
