@@ -21,7 +21,7 @@ namespace Task
                         if (result.Length > 0)
                         {
                             result = result.Remove(result.Length - 1, 1);
-                            Console.Write(key.KeyChar + " " + key.KeyChar);
+                            Console.Write(key.KeyChar);
                         }
                         break;
                     case ConsoleKey.Enter:
