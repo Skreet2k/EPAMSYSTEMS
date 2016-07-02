@@ -43,9 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="File.cs" />
-    <Compile Include="FileEventArgs.cs" />
-    <Compile Include="FileProcessing.cs" />
+    <Compile Include="FileReadWrite.cs" />
+    <Compile Include="FileReadWriteEventArgs.cs" />
+    <Compile Include="FileHandler.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
