@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Kharkovskiy_Alexander_Task2
 {
-    internal class FileHandler // Тип для обработки данных считанных из файла.
+    internal class FileHandler // Класс для обработки данных считанных из файла.
     {
         public const char Spliter = ';';
         private readonly FileReadWrite _file;
@@ -21,7 +21,6 @@ namespace Kharkovskiy_Alexander_Task2
         public string OutputFilePath { get; }
         public int SumOfDigits { get; private set; }
         public int NumOfLetters { get; private set; }
-
 
         public void HandleData() // Обработка данных в зависимости от ее типа.
         {
@@ -74,7 +73,7 @@ namespace Kharkovskiy_Alexander_Task2
 
         private static void FileEndRead(object sender, FileReadWriteEventArgs e) // Метод для подписи на событие окончания чтения из файла.
         {
-            Console.WriteLine($"Считывание данных из файла завершено!\nСчитанные данные: ");
+            Console.WriteLine("Считывание данных из файла завершено!\nСчитанные данные: ");
             foreach (var data in e.FileData)
             {
                 Console.WriteLine($"{data}");
@@ -83,7 +82,7 @@ namespace Kharkovskiy_Alexander_Task2
 
         private static void FileEndWrite(object sender, FileReadWriteEventArgs e)// Метод для подписи на событие окончания записи в файла.
         {
-            Console.WriteLine($"Запись данных в файл завершено!\nЗаписанные данные: ");
+            Console.WriteLine("Запись данных в файл завершено!\nЗаписанные данные: ");
             foreach (var data in e.FileData)
             {
                 Console.WriteLine($"{data}");

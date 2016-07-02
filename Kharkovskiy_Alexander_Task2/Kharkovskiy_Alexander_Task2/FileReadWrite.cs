@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Kharkovskiy_Alexander_Task2
 {
-    internal class FileReadWrite // Тип с методами считывание/записи данных из файла.
-        //Тип хранящий подписавшиеся на события типы. Тип инициализирующий события.
+    internal class FileReadWrite // Класс с методами считывания/записи данных из файла.
+                                 //Тип хранящий подписавшиеся на события типы. Тип инициализирующий события.
     {
         public event EventHandler<FileReadWriteEventArgs> EndRead;
         public event EventHandler<FileReadWriteEventArgs> EndWrite;
