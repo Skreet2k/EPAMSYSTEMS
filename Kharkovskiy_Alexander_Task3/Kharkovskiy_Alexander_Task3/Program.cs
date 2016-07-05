@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Task1
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main()
         {
+            var round = Round.CreateRoundFromConsole();
+            Console.WriteLine(
+                $"Наш круг с координатами центра ({round.X},{round.Y}) и радиусом R = {round.Radius} имеет\nплощадь S = {round.Area}\nдлинну окружности L = {round.Length}");
+            Console.ReadLine();
         }
     }
 }
