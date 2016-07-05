@@ -51,10 +51,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Kharkovskiy_Alexander_Task3\Task1.csproj">
-      <Project>{e4257d12-a73a-46b9-a4b8-c8b72a70e079}</Project>
-      <Name>Task1</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Task3\Task3.csproj">
       <Project>{3ff28ab1-735d-4237-aaf3-b07a81de2b17}</Project>
       <Name>Task3</Name>
