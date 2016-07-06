@@ -25,7 +25,7 @@ namespace Task4
             Console.Write("Введите отчество: ");
             var patronymic = Console.ReadLine();
             Console.WriteLine("Теперь разберемся с датой рождения!");
-            var birthday = Task3.DateHelper.ReadDateOfBirthdayFormConsole();
+            var birthday = DateHelper.ReadDateOfBirthdayFormConsole();
             Console.Write("Занимаемая должность: ");
             var position = Console.ReadLine();
             var experience = DoubleHelper.ReadDoubleFormConsole("Стаж работы: ", true);
