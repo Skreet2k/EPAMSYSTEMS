@@ -1,5 +1,7 @@
 ﻿using System;
+using Task1;
 using Task3;
+
 
 namespace Task4
 {
@@ -26,7 +28,7 @@ namespace Task4
             var birthday = Task3.DateHelper.ReadDateOfBirthdayFormConsole();
             Console.Write("Занимаемая должность: ");
             var position = Console.ReadLine();
-            var experience = Task1.DoubleHelper.ReadDoubleFormConsole("Стаж работы: ", true);
+            var experience = DoubleHelper.ReadDoubleFormConsole("Стаж работы: ", true);
             return new Employee(surname, name, patronymic, birthday, position, experience);
         }
     }
