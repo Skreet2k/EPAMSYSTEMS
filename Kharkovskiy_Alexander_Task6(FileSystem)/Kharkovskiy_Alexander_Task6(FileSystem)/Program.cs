@@ -1,4 +1,4 @@
-﻿using System;
+﻿
 
 namespace Kharkovskiy_Alexander_Task6_FileSystem_
 {
@@ -6,12 +6,7 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
     {
         private static void Main()
         {
-            while (true)
-            {
-                UserConsoleInterface.ShowFolderToConsole();
-                UserConsoleInterface.ReadCommandFormConsole();
-            }
-            Console.ReadLine();
+            UserConsoleInterface.Show();
         }
     }
 }

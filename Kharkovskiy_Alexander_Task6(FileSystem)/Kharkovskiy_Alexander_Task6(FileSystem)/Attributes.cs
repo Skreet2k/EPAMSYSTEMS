@@ -2,6 +2,10 @@
 {
     internal class Attributes
     {
+        
+        /// <summary>
+        /// Конструктор по умолчанию, заполняет все атрибуты значением false;
+        /// </summary>
         public Attributes()
         {
             IsArchive = false;
@@ -9,7 +13,13 @@
             IsReadOnly = false;
             IsSystem = false;
         }
-
+        /// <summary>
+        /// Пользовательский конструктор.
+        /// </summary>
+        /// <param name="isArchive">Архивный</param>
+        /// <param name="isHidden">Скрытый</param>
+        /// <param name="isReadOnly">Только для чтения</param>
+        /// <param name="isSystem">Системный</param>
         public Attributes(bool isArchive, bool isHidden, bool isReadOnly, bool isSystem)
         {
             IsArchive = isArchive;
@@ -18,10 +28,10 @@
             IsSystem = isSystem;
         }
 
-        private bool IsArchive { get; }
-        private bool IsHidden { get; }
-        private bool IsReadOnly { get; }
-        private bool IsSystem { get; }
+        public bool IsArchive { get; }
+        public bool IsHidden { get; }
+        public bool IsReadOnly { get;}
+        public bool IsSystem { get;}
 
         public override string ToString()
         {

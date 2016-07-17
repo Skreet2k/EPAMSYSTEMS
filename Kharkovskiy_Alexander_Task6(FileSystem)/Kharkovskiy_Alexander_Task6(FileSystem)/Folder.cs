@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
@@ -7,58 +6,71 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
 {
     internal class Folder: IVirtualFileSystem
     {
-        public static Folder RootFolder = new Folder("root");
+        /// <summary>
+        /// Корневая папка по умолчанию
+        /// </summary>
+        public static Folder RootFolder { get; } = new Folder("root");
 
         public Attributes Attributes { get; private set; } = new Attributes();
         private string _name = "New Folder";
-
+        /// <summary>
+        /// Конструктр 
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="parentFolder"></param>
+        /// <param name="attributes"></param>
         public Folder(string name, Folder parentFolder, Attributes attributes)
         {
             if (parentFolder == null)
             {
-                Trace.TraceError("Ошибка при создании папки! Указанной папки-родителя не существует!");
-                throw new ArgumentNullException();
+                parentFolder = RootFolder;
+                Trace.TraceWarning($"Попытка создания папки без ссылки на папку-родителя. Папка {name} создана в каталоге root.");
+            }
+            if (name == null)
+            {
+                name = "New Folder";
+                Trace.TraceWarning($"Попытка создания папки без ссылки на имя папки. Папка создана с именем по умолчанию {name}.");
             }
             if (attributes == null)
             {
-                Trace.TraceError("Ошибка при создании папки! Указанных атрибутов не существует!");
-                throw new ArgumentNullException();
+                attributes = new Attributes();
+                Trace.TraceWarning("Попытка создания папки без ссылки на атрибуты. Папка создана с атрибутами по умолчанию.");
             }
             ParentFolder = parentFolder;
             ParentFolder.Nested.Add(this);
             Name = name;
             Attributes = attributes;
         }
-
-        public Folder(string name, Folder parentFolder)
-        {
-            if (parentFolder == null)
-            {
-                Trace.TraceError("Ошибка при создании папки! Указанной папки-родителя не существует!");
-                Trace.Flush();
-                throw new ArgumentNullException();
-            }
-            ParentFolder = parentFolder;
-            ParentFolder.Nested.Add(this);
-            Name = name;
-        }
-
+        /// <summary>
+        /// Конструктор для создания корневой папки не имеющей родителя (root).
+        /// </summary>
+        /// <param name="name">Имя папки</param>
         private Folder(string name)
         {
             _name = name;
         }
-
+        /// <summary>
+        /// Имя файла
+        /// </summary>
         public string Name
         {
             get { return _name; }
 
             set { _name = ParseName(value); }
         }
-
+        /// <summary>
+        /// Папки и файлы содержащиеся в этой папке.
+        /// </summary>
         public List<IVirtualFileSystem> Nested { get; } = new List<IVirtualFileSystem>();
-
+        /// <summary>
+        /// Папка - родитель
+        /// </summary>
         public Folder ParentFolder { get; private set; }
-
+        /// <summary>
+        /// Проверка имени на валидность. Автоматическое исправление. Проверяется наличие спецсимволов, длинна, наличие таких же имен в данной папке.
+        /// </summary>
+        /// <param name="name">Имя папки.</param>
+        /// <returns>Исправленное имя папки.</returns>
         private string ParseName(string name)
         {
             if (name.IsContains('|', '/', '\\', ':', '*', '?', '"', '>', '<'))
@@ -93,23 +105,30 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
             }
             return name;
         }
+        /// <summary>
+        /// Копирование папки в другой каталог.
+        /// </summary>
+        /// <param name="parentFolder">Папка в которую произведется копирование.</param>
         public void Copy(Folder parentFolder)
         {
             if (parentFolder == null)
             {
-                Trace.TraceError($"Ошибка при копировании папки {Name} из директории {GetDirectoryTree()}! Указанной папки-родителя не существует!");
-                throw new ArgumentNullException();
+                Trace.TraceError($"Ошибка при копировании папки {Name} из директории {GetDirectoryTree()}. Ссылки на папку-родителя не существует. Папка не была скопирована.");
+                return;
             }
-            var copyFolder = new Folder(Name, parentFolder);
+            var copyFolder = new Folder(Name, parentFolder, Attributes);
             Trace.TraceInformation($"Папка {Name} из директории {GetDirectoryTree()} скопирована в {copyFolder.GetDirectoryTree()}");
         }
-
+        /// <summary>
+        /// Перемещение папки в другой каталог.
+        /// </summary>
+        /// <param name="parentFolder">Папка в которую произведется перемещение.</param>
         public void Move(Folder parentFolder)
         {
             if (parentFolder == null)
             {
-                Trace.TraceError($"Ошибка при перемещении папки {Name} из директории {GetDirectoryTree()}! Указанной папки-родителя не существует!");
-                throw new ArgumentNullException();
+                Trace.TraceError($"Ошибка при перемещении папки {Name} из директории {GetDirectoryTree()}. Ссылки на папку-родителя не существует. Папка не была перемещена.");
+                return;
             }
             if (parentFolder == ParentFolder)
                 return;
@@ -120,22 +139,33 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
             ParentFolder.Nested.Add(this);
 
         }
-
+        /// <summary>
+        /// Удаление папки.
+        /// </summary>
         public void Remove()
         {
             Trace.TraceInformation($"Папка {Name} из директории {GetDirectoryTree()} удалена!");
             ParentFolder?.Nested.Remove(this);
             ParentFolder = null;
         }
-
+        /// <summary>
+        /// Изменение атрибутов папки.
+        /// </summary>
+        /// <param name="newAttr">Атрибуты.</param>
         public void ChangeAttributes(Attributes newAttr)
         {
-            Trace.TraceInformation($"Изменены атрибуты папки {Name} из директории {GetDirectoryTree()}");
             if (newAttr == null)
-                throw new ArgumentNullException();
+            {
+                Trace.TraceError($"Ошибка при изменении атрибутов папки {Name} из директории {GetDirectoryTree()}. Ссылки на атрибуты не существует. Атрибуты не были изменены.");
+                return;
+            }
+            Trace.TraceInformation($"Изменены атрибуты папки {Name} из директории {GetDirectoryTree()}");
+
             Attributes = newAttr;
         }
-
+        /// <summary>
+        /// Получение дерева каталогов (путь к папке).
+        /// </summary>
         public string GetDirectoryTree()
         {
             var temp = ParentFolder;
@@ -147,6 +177,9 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
             }
             return three;
         }
+        /// <summary>
+        /// Строковое представление папки.
+        /// </summary>
         public override string ToString()
         {
             return Nested.Count == 0 ? "Empty folder" : "Folder with files";

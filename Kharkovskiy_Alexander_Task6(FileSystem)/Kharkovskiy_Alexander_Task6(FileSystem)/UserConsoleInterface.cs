@@ -1,157 +1,260 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.Design;
-using System.Data;
-using System.Dynamic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Kharkovskiy_Alexander_Task6_FileSystem_
 {
-    class UserConsoleInterface
+    internal static class UserConsoleInterface
     {
-        private static Folder currentFolder = Folder.RootFolder;
-        private static string LastMessage;
-        public static void ShowFolderToConsole()
-        {   Console.Clear();         
-            Console.WriteLine($"{new string('_', Console.WindowWidth)}\nCurrent folder: {currentFolder.GetDirectoryTree()}\\{currentFolder.Name}\n{new string('_', Console.WindowWidth)}");
+        /// <summary>
+        /// _currentCommands - считанная команда с консоли;
+        /// _commandArray - массив считанных команд с консоли по сплитеру " ";
+        /// _lastMessage - сообщение, которое выводится сразу после вывода содержимого папки;
+        /// _currentFolder - текущая папка;
+        /// </summary>
+        private static string _currentCommands;
+        private static string[] _commandArray;
+        private static string _lastMessage = "Welocome to Virtual File System. Use console command 'help'.";
+        private static Folder _currentFolder = Folder.RootFolder;
+
+        /// <summary>
+        /// Словарь с командами;
+        /// </summary>
+        public static Dictionary<string, Action> CommandsDictionary = new Dictionary<string, Action>
+        {
+            {"help", ShowHelp},
+            {string.Empty, ShowHelp},
+            {"attributes", ShowAttributes },
+            {"create", CreateFolder},
+            {"remove", RemoveFolder},
+            {"rename", RenameFolder},
+            {"move", MoveToFolder},
+            {"back", MoveBack},
+            {"copy", CopyFolder},
+            {"exit", Exit}
+        };
+        /// <summary>
+        /// Показать интерфейс пользователя в консоли.
+        /// </summary>
+        public static void Show()
+        {
+            while (true)
+            {
+                ShowFolderToConsole();
+                ReadCommandFormConsole();
+            }
+        }
+        /// <summary>
+        /// Интерфейс папки
+        /// </summary>
+        private static void ShowFolderToConsole()
+        {
+            Console.Clear();
+            Console.WriteLine(
+                $"{new string('_', Console.WindowWidth)}\nCurrent folder: {_currentFolder.GetDirectoryTree()}\\{_currentFolder.Name}\n{new string('_', Console.WindowWidth)}");
             Console.WriteLine($"{"Name",-40}Type");
-            foreach (var items in currentFolder.Nested)
+            foreach (var items in _currentFolder.Nested)
             {
                 Console.WriteLine($"{items.Name,-40}{items}");
             }
-            Console.WriteLine($"\n{LastMessage}\n");
+            Console.WriteLine($"\n{_lastMessage}\n");
         }
-
-        public static void ReadCommandFormConsole()
+        /// <summary>
+        /// Поле ввода консольных команд
+        /// </summary>
+        private static void ReadCommandFormConsole()
         {
-            var temp = Console.ReadLine();
-            if (string.IsNullOrEmpty(temp))
-
+            _currentCommands = Console.ReadLine();
+            _commandArray = _currentCommands?.Split(' ');
+            if (_commandArray != null && CommandsDictionary.ContainsKey(_commandArray[0]))
             {
-                ReadCommandFormConsole();
-                LastMessage = "Next possible command: create, remove, move, rename, attributes, exit.";
+                CommandsDictionary[_commandArray[0]]();
             }
-            else if (temp[0] == '\\')
-                ChangeFolder(temp.TrimStart('/').Split('\\'));
-            else 
-                MakeCommand(temp.Split(' '));
+            else
+            {
+                MoveToFolder();
+            }
         }
-
-        private static void ChangeFolder(string[] path)
+        /// <summary>
+        /// Переход в другую папку 
+        /// </summary>
+        private static void MoveToFolder()
         {
+            var path = _currentCommands.Trim('\\').Split('\\');
             foreach (var item in path)
             {
-                var temp = (SearchObject(item));
+                var temp = SearchObject(item);
                 if (temp != null && temp.GetType() == typeof(Folder))
-                    currentFolder = temp as Folder;               
+                {
+                    _currentFolder = temp as Folder;
+                    _lastMessage = $"Current folder was change to {_currentFolder?.Name}";
+                }
             }
         }
-        private static void MakeCommand(string[] command) // Убрать рекурсию, сделать сначало условие трушного действия а потом брейк
+        /// <summary>
+        /// Возврат к папке-родителю.
+        /// </summary>
+        private static void MoveBack()
         {
-            switch (command?[0])
+            if (_currentFolder.ParentFolder == null)
             {
-                case "help":
-                    LastMessage = "Next possible command: create, remove, move, rename, attributes, exit, back";
-                    break;
-                case "create":
-                    if (command.Length < 3)
-                    {
-                        LastMessage = "Possible command: create folder|file name.";
-                        ReadCommandFormConsole();
-                    }
-                    Create(command);
-                    break;
-                case "remove":
-                    if (command.Length < 2)
-                    {
-                        LastMessage = "Possible command: remove name.";
-                        ReadCommandFormConsole();
-                    }
-                    Console.WriteLine();
-                    if (SearchObject(Name(command, 1)) == null)
-                    {
-                        LastMessage = $"{Name(command, 1)} not found.";
-                        ReadCommandFormConsole();
-                    }
-                    SearchObject(Name(command, 1)).Remove();
-                    LastMessage = $"{Name(command, 1)} was removed.";
-
-                    break;
-                case "exit":
-                    Environment.Exit(0);
-                    break;
-                case "rename":
-                    if (command.Length < 3)
-                    {
-                        LastMessage = "Possible comand: rename name newname.";
-                    }
-                    if (SearchObject(command[1]) == null)
-                    {
-                        LastMessage = $"{command[1]} not found.";
-                        ReadCommandFormConsole();
-                    }
-                    SearchObject(command[1]).Name = command[2];
-                    LastMessage = $"{command[1]} was renamed to {command[2]}.";
-                    break;
-                case "back":
-                    if (currentFolder.ParentFolder == null)
-                    {
-                        LastMessage = "This folder is root";
-                        ReadCommandFormConsole();
-                    }
-                    else
-                    {
-                        currentFolder = currentFolder.ParentFolder;
-                        LastMessage = $"Moved to {currentFolder.Name}";
-                    }
-                    break;
-                default:
-                    LastMessage = "Next possible command: create, remove, move, rename, attributes.";
-                    ReadCommandFormConsole();
-                    break;
+                _lastMessage = "This folder is root";
+            }
+            else
+            {
+                _currentFolder = _currentFolder.ParentFolder;
+                _lastMessage = $"Moved to {_currentFolder.Name}";
             }
         }
-        private static void Create(string[] command)
+        /// <summary>
+        /// Копирование файла/папки в в текущий каталог
+        /// </summary>
+        private static void CopyFolder()
         {
-            switch (command[1])
+            if (_commandArray.Length < 2)
             {
-                case "file":
-                    var file = new File(Name(command,2), currentFolder);
-                    LastMessage = $"{file.Name} file create is succsesfull.";
-                    break;
-
-                case "folder":
-                    var folder = new Folder((Name(command, 2)), currentFolder);
-                    LastMessage = $"{folder.Name} folder create is succsesfull.";
-                    break;
-                default:
-                    LastMessage = "Next possible command: folder file.";
-                    ReadCommandFormConsole();
-                    break;
+                _lastMessage = "Possible command: copy name.";
+                return;
             }
+            if (SearchObject(Name(1)) == null)
+            {
+                _lastMessage = $"{Name(1)} not found.";
+                return;
+            }
+            IVirtualFileSystem obj;
+            if (SearchObject(Name(1)).GetType() == typeof(File))
+            {
+                obj = new File(Name(1), _currentFolder, null);
+                
+            }
+            else
+            {
+                obj = new Folder(Name(1), _currentFolder, null);
+            }
+            _lastMessage = $"Copy {obj.Name} was created.";
+        }
+        /// <summary>
+        /// Закрытие консоли
+        /// </summary>
+        private static void Exit()
+        {
+            Environment.Exit(0);
         }
 
+        private static void ShowAttributes()
+        {
+            if (_commandArray.Length < 2)
+            {
+                _lastMessage = "Possible command: attributes name";
+                return;
+            }
+            if (SearchObject(Name(1)) == null)
+            {
+                _lastMessage = $"{Name(1)} not found.";
+            }
+            else
+            {
+                _lastMessage = SearchObject(Name(1)).Attributes.ToString();
+            }
+        }
+        /// <summary>
+        /// Создание папки
+        /// </summary>
+        private static void CreateFolder()
+        {
+            if (_commandArray.Length < 2)
+            {
+                _lastMessage = "Possible command: create file | folder name";
+                return;
+            }
+            if (_commandArray[1] == "file")
+            {
+                var file = new File(Name(2), _currentFolder, null);
+                _lastMessage = $"{file.Name} file create is succsesfull.";
+                return;
+            }
+
+            if (_commandArray[1] == "folder")
+            {
+                var folder = new Folder(Name(2), _currentFolder, null);
+                _lastMessage = $"{folder.Name} folder create is succsesfull.";
+                return;
+            }
+            _lastMessage = "Possible command: create file | folder name";
+        }
+        /// <summary>
+        /// Удаление папки/файла
+        /// </summary>
+        private static void RemoveFolder()
+        {
+            if (_commandArray.Length < 2)
+            {
+                _lastMessage = "Possible command: remove name.";
+                return;
+            }
+            if (SearchObject(Name(1)) == null)
+            {
+                _lastMessage = $"{Name(1)} not found.";
+                return;
+            }
+            SearchObject(Name(1)).Remove();
+            _lastMessage = $"{Name(1)} was removed.";
+        }
+        /// <summary>
+        /// Переименование папки
+        /// </summary>
+        private static void RenameFolder()
+        {
+            if (_commandArray.Length < 2 || Array.IndexOf(_commandArray, ":") == -1)
+            {
+                _lastMessage = "Possible comand: rename name : newname.";
+                return;
+            }
+            var nameEndIndex = Array.IndexOf(_commandArray, ":");
+            if (SearchObject(Name(1, nameEndIndex)) == null)
+            {
+                _lastMessage = $"{Name(1, nameEndIndex)} not found.";
+            }
+            else
+            {
+                SearchObject(Name(1, nameEndIndex)).Name = Name(nameEndIndex + 1);
+                _lastMessage = $"{Name(1, nameEndIndex)} was renamed to {SearchObject(Name(1, nameEndIndex)).Name}.";
+            }
+        }
+        /// <summary>
+        /// Поиск папки/файла с именем name в текущем каталоге.
+        /// </summary>
+        /// <param name="name">Имя папки/файла</param>
+        /// <returns>Возвращает объект интерефейса</returns>
         private static IVirtualFileSystem SearchObject(string name)
         {
-            foreach (var item in currentFolder.Nested)
+            foreach (var item in _currentFolder.Nested)
             {
                 if (item.Name == name)
                     return item;
             }
             return null;
         }
-
-        private static string Name(string[] command, int nameStartIndex)
+        /// <summary>
+        /// Показывает помощь при вводе "help"
+        /// </summary>
+        private static void ShowHelp()
         {
-            var arrayString = new string[command.Length - nameStartIndex];
-            Array.Copy(command, nameStartIndex,arrayString,0,arrayString.Length);
+            _lastMessage = "You can use next commands: create, copy, move, remove, rename, attributes, back, exit.";
+        }
+        /// <summary>
+        /// Из массива команда _commandArray возвращает имя
+        /// </summary>
+        /// <param name="nameStartIndex">Начальный индекс имени в массиве</param>
+        /// <param name="nameEndIndex">Конечный индекс имени в массиве</param>
+        private static string Name(int nameStartIndex, int nameEndIndex = 0)
+        {
+            if (nameEndIndex == 0)
+            {
+                nameEndIndex = _commandArray.Length;
+            }
+            var arrayString = new string[nameEndIndex - nameStartIndex];
+            Array.Copy(_commandArray, nameStartIndex, arrayString, 0, arrayString.Length);
             var str = string.Join(" ", arrayString);
-
             return str;
         }
     }
