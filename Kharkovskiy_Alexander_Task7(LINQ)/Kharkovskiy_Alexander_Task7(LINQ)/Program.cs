@@ -193,8 +193,8 @@ namespace Kharkovskiy_Alexander_Task7_LINQ_
             {
                 Console.WriteLine("Клиенты не найдены!");
             }
-            Console.WriteLine("Результаты были записаны в clients.xml");
-            SerializeToXml(filteredClients, @"clients.xml"); // Запись результатов в xml.
+            Console.WriteLine("Результаты были записаны в output.xml");
+            SerializeToXml(filteredClients, @"output.xml"); // Запись результатов в xml.
             Console.ReadLine();
         }
     }
