@@ -26,7 +26,7 @@ namespace Services
         public override string ToString()
         {
             var sb = new StringBuilder();
-            var fs = new FileSystem(_rootFolder);
+            var fs = new FsElement(_rootFolder);
             var tempobj = fs.ParsePath(_path);
             if (tempobj != null)
             {
@@ -38,7 +38,7 @@ namespace Services
                 }
                 return sb.ToString();
             }
-            return $"Object in directory {_path} not found.";
+            return $"Error. Object in directory {_path} not found.";
         }
     }
 }

@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using Data;
+using Services;
+using ServicesImpl;
 
-namespace Kharkovskiy_Alexander_Task6_FileSystem_
+namespace Server
 {
     internal static class ConsoleInterface
     {
@@ -11,19 +14,19 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
         /// _lastMessage - сообщение, которое выводится сразу после вывода содержимого папки;
         /// _currentFolder - текущая папка;
         /// </summary>
+        private static LocalFileSystem _lfs;
         private static string _currentCommands;
         private static string[] _commandArray;
         private static string _lastMessage = "Welocome to Virtual File System. Use console command 'help'.";
-        private static Folder _currentFolder = Folder.RootFolder;
+        private static string _currentPath = @"root:\";
 
         /// <summary>
         /// Словарь с командами;
         /// </summary>
-        public static Dictionary<string, Action> CommandsDictionary = new Dictionary<string, Action>
+        private static readonly Dictionary<string, Action> CommandsDictionary = new Dictionary<string, Action>
         {
             {"help", ShowHelp},
             {string.Empty, ShowHelp},
-            {"attributes", ShowAttributes },
             {"create", CreateFolder},
             {"remove", RemoveFolder},
             {"rename", RenameFolder},
@@ -35,8 +38,9 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
         /// <summary>
         /// Показать интерфейс пользователя в консоли.
         /// </summary>
-        public static void Show()
+        public static void Show(LocalFileSystem lfs)
         {
+            _lfs = lfs;
             while (true)
             {
                 ShowFolderToConsole();
@@ -49,13 +53,7 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
         private static void ShowFolderToConsole()
         {
             Console.Clear();
-            Console.WriteLine(
-                $"{new string('_', Console.WindowWidth)}\nCurrent folder: {_currentFolder.GetDirectoryTree()}\\{_currentFolder.Name}\n{new string('_', Console.WindowWidth)}");
-            Console.WriteLine($"{"Name",-40}Type");
-            foreach (var items in _currentFolder.Nested)
-            {
-                Console.WriteLine($"{items.Name,-40}{items}");
-            }
+            Console.WriteLine(_lfs.GetDirectoryThree(_currentPath));
             Console.WriteLine($"\n{_lastMessage}\n");
         }
         /// <summary>
@@ -79,30 +77,25 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
         /// </summary>
         private static void MoveToFolder()
         {
-            var path = _currentCommands.Trim('\\').Split('\\');
-            foreach (var item in path)
-            {
-                var temp = SearchObject(item);
-                if (temp != null && temp.GetType() == typeof(Folder))
-                {
-                    _currentFolder = temp as Folder;
-                    _lastMessage = $"Current folder was change to {_currentFolder?.Name}";
-                }
-            }
+            _lfs.GetDirectoryThree(_currentCommands);
+          //  if (.Contains("Error"))
+                _currentPath = @"root:\" + _currentCommands.Trim('\\') + "\\";
+            _lastMessage = "";
         }
         /// <summary>
         /// Возврат к папке-родителю.
         /// </summary>
         private static void MoveBack()
         {
-            if (_currentFolder.ParentFolder == null)
+            if (_currentPath.Equals(@"root:\"))
             {
                 _lastMessage = "This folder is root";
             }
             else
             {
-                _currentFolder = _currentFolder.ParentFolder;
-                _lastMessage = $"Moved to {_currentFolder.Name}";
+                _currentPath = _currentPath.TrimEnd('\\');
+                _currentPath = _currentPath.Remove(_currentPath.LastIndexOf('\\') + 1);
+                _lastMessage = $"Moved to {_currentPath}";
             }
         }
         /// <summary>
@@ -115,46 +108,16 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
                 _lastMessage = "Possible command: copy name.";
                 return;
             }
-            if (SearchObject(Name(1)) == null)
-            {
-                _lastMessage = $"{Name(1)} not found.";
-                return;
-            }
-            IVirtualFileSystem obj;
-            if (SearchObject(Name(1)).GetType() == typeof(File))
-            {
-                obj = new File(Name(1), _currentFolder, null);
-                
-            }
-            else
-            {
-                obj = new Folder(Name(1), _currentFolder, null);
-            }
-            _lastMessage = $"Copy {obj.Name} was created.";
+            _lfs.Copy(Name(1), _currentPath, _currentPath);
+            _lastMessage = "";
         }
         /// <summary>
         /// Закрытие консоли
         /// </summary>
         private static void Exit()
         {
+            new LocalFileSystemData().Safe(_lfs, @"LFSDate.dat");
             Environment.Exit(0);
-        }
-
-        private static void ShowAttributes()
-        {
-            if (_commandArray.Length < 2)
-            {
-                _lastMessage = "Possible command: attributes name";
-                return;
-            }
-            if (SearchObject(Name(1)) == null)
-            {
-                _lastMessage = $"{Name(1)} not found.";
-            }
-            else
-            {
-                _lastMessage = SearchObject(Name(1)).Attributes.ToString();
-            }
         }
         /// <summary>
         /// Создание папки
@@ -166,20 +129,20 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
                 _lastMessage = "Possible command: create file | folder name";
                 return;
             }
-            if (_commandArray[1] == "file")
+            switch (_commandArray[1])
             {
-                var file = new File(Name(2), _currentFolder, null);
-                _lastMessage = $"{file.Name} file create is succsesfull.";
-                return;
+                case "file":
+                    _lfs.Create(Name(2),typeof(File),_currentPath);
+                    _lastMessage = "";
+                    return;
+                case "folder":
+                    _lfs.Create(Name(2), typeof(Folder), _currentPath);
+                    _lastMessage = "";
+                    return;
+                default:
+                    _lastMessage = "Possible command: create file | folder name";
+                    return;
             }
-
-            if (_commandArray[1] == "folder")
-            {
-                var folder = new Folder(Name(2), _currentFolder, null);
-                _lastMessage = $"{folder.Name} folder create is succsesfull.";
-                return;
-            }
-            _lastMessage = "Possible command: create file | folder name";
         }
         /// <summary>
         /// Удаление папки/файла
@@ -191,55 +154,29 @@ namespace Kharkovskiy_Alexander_Task6_FileSystem_
                 _lastMessage = "Possible command: remove name.";
                 return;
             }
-            if (SearchObject(Name(1)) == null)
-            {
-                _lastMessage = $"{Name(1)} not found.";
-                return;
-            }
-            SearchObject(Name(1)).Remove();
-            _lastMessage = $"{Name(1)} was removed.";
+            _lfs.Remove(Name(1), _currentPath);
+            _lastMessage = "";
         }
         /// <summary>
         /// Переименование папки
         /// </summary>
         private static void RenameFolder()
         {
-            if (_commandArray.Length < 2 || Array.IndexOf(_commandArray, ":") == -1)
+            var indexofname = Array.IndexOf(_commandArray, ":");
+            if (_commandArray.Length < 2 || indexofname == -1)
             {
                 _lastMessage = "Possible comand: rename name : newname.";
                 return;
             }
-            var nameEndIndex = Array.IndexOf(_commandArray, ":");
-            if (SearchObject(Name(1, nameEndIndex)) == null)
-            {
-                _lastMessage = $"{Name(1, nameEndIndex)} not found.";
-            }
-            else
-            {
-                SearchObject(Name(1, nameEndIndex)).Name = Name(nameEndIndex + 1);
-                _lastMessage = $"{Name(1, nameEndIndex)} was renamed to {SearchObject(Name(1, nameEndIndex)).Name}.";
-            }
-        }
-        /// <summary>
-        /// Поиск папки/файла с именем name в текущем каталоге.
-        /// </summary>
-        /// <param name="name">Имя папки/файла</param>
-        /// <returns>Возвращает объект интерефейса</returns>
-        private static IVirtualFileSystem SearchObject(string name)
-        {
-            foreach (var item in _currentFolder.Nested)
-            {
-                if (item.Name == name)
-                    return item;
-            }
-            return null;
+            _lfs.Rename(Name(1, indexofname), _currentPath, Name(indexofname + 1));
+            _lastMessage = "";
         }
         /// <summary>
         /// Показывает помощь при вводе "help"
         /// </summary>
         private static void ShowHelp()
         {
-            _lastMessage = "You can use next commands: create, copy, move, remove, rename, attributes, back, exit.";
+            _lastMessage = "You can use next commands: create, copy, move, remove, rename, back, exit.";
         }
         /// <summary>
         /// Из массива команда _commandArray возвращает имя

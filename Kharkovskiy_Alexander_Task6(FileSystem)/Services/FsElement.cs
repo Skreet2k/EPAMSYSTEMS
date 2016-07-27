@@ -10,7 +10,7 @@ namespace Services
     /// Файловая система. Базовый класс.
     /// </summary>
     [Serializable]
-    public class  FileSystem
+    public class  FsElement
     {
         private string _name;
         /// <summary>
@@ -21,7 +21,7 @@ namespace Services
         /// Создание файловой системы с помощью уже созданной/наполенной коревой папки.
         /// </summary>
         /// <param name="rootFolder">Корневая папка.</param>
-        public FileSystem(Folder rootFolder)
+        public FsElement(Folder rootFolder)
         {
             RootFolder = rootFolder;
         }
@@ -31,7 +31,7 @@ namespace Services
         /// <param name="name">Имя. Может принимать null или пустую строку.</param>
         /// <param name="parentFolder">Папка-родитель. Может принимать null.</param>
         /// <param name="attributes">Атрибуты. Может принимать null.</param>
-        public FileSystem(string name, Folder parentFolder, Attributes attributes)
+        public FsElement(string name, Folder parentFolder, Attributes attributes)
         {
             if (parentFolder == null)
             {
@@ -58,7 +58,7 @@ namespace Services
         /// <param name="name">Имя. Может принимать null или пустую строку.</param>
         /// <param name="path">Путь до папки-родителя. Может начинаться с 'root:\' или '\'.</param>
         /// <param name="attributes">Атрибуты. Может принмать null.</param>
-        public FileSystem(string name, string path, Attributes attributes):this(name: name, parentFolder: null, attributes: attributes)
+        public FsElement(string name, string path, Attributes attributes):this(name: name, parentFolder: null, attributes: attributes)
         {
             ParentFolder = ParsePath(path) ?? RootFolder;
         }
@@ -66,7 +66,7 @@ namespace Services
         /// Приватный конструктор для создания root.
         /// </summary>
         /// <param name="name"></param>
-        protected FileSystem(string name)
+        protected FsElement(string name)
         {
             Name = name;
             ParentFolder = null;

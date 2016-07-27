@@ -6,7 +6,7 @@ namespace Services
     /// Файл файловой системы.
     /// </summary>
     [Serializable] 
-    public class File : FileSystem
+    public class File : FsElement
     {
         /// <summary>
         /// Создание экземпляра файла.

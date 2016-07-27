@@ -4,12 +4,12 @@ using System.Collections.Generic;
 namespace Services
 {
     [Serializable]
-    public class Folder: FileSystem
+    public class Folder: FsElement
     {
         /// <summary>
         /// Лист с дочерними элементами.
         /// </summary>
-        public List<FileSystem> Nested { get; set; } = new List<FileSystem>();
+        public List<FsElement> Nested { get; set; } = new List<FsElement>();
 
         /// <summary>
         /// Создание экземпляра папки.

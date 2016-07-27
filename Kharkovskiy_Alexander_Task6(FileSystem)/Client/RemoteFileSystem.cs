@@ -28,6 +28,11 @@ namespace Client
             throw new NotImplementedException();
         }
 
+        public void Rename(string name, string path, string newname)
+        {
+            throw new NotImplementedException();
+        }
+
         public string GetDirectoryThree(string path)
         {
             throw new NotImplementedException();

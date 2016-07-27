@@ -46,7 +46,7 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="File.cs" />
     <Compile Include="Folder.cs" />
-    <Compile Include="FileSystem.cs" />
+    <Compile Include="FsElement.cs" />
     <Compile Include="IVirtualFileSystem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
