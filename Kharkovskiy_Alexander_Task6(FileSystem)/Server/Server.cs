@@ -52,8 +52,6 @@ namespace Server
                         var msg = System.Text.Encoding.ASCII.GetBytes(data);
                         stream.Write(msg, 0, msg.Length);
                         Console.WriteLine($"Отправили клиенту: {data}");
-
-
                     }
                     client.Close();
                 }
