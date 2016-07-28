@@ -60,7 +60,7 @@ namespace Services
         /// <param name="attributes">Атрибуты. Может принмать null.</param>
         public FsElement(string name, string path, Attributes attributes):this(name: name, parentFolder: null, attributes: attributes)
         {
-            ParentFolder = ParsePath(path) ?? RootFolder;
+            ParentFolder = ParsePath(path, RootFolder) ?? RootFolder;
         }
         /// <summary>
         /// Приватный конструктор для создания root.
@@ -165,14 +165,15 @@ namespace Services
             }
             return directory.ToString();
         }
+
         /// <summary>
         /// Парсинг пути к папке.
         /// </summary>
         /// <param name="path">Путь. Может начинаться с 'root:\'.</param>
+        /// <param name="folder"></param>
         /// <returns>Папка по указанному пути или null, если ее не существует.</returns>
-        public Folder ParsePath(string path)
+        public Folder ParsePath(string path, Folder folder)
         {
-            var folder = RootFolder;
             var arrayPath = path?.Replace(@"root:\", "").Trim('\\').Split('\\');
             if (string.IsNullOrWhiteSpace(arrayPath?[0])) return folder;
             return arrayPath.Aggregate(folder, (current, s) => current?.Nested.FirstOrDefault(x => x.Name == s) as Folder);

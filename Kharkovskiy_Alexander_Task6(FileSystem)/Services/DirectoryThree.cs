@@ -27,7 +27,7 @@ namespace Services
         {
             var sb = new StringBuilder();
             var fs = new FsElement(_rootFolder);
-            var tempobj = fs.ParsePath(_path);
+            var tempobj = fs.ParsePath(_path, _rootFolder);
             if (tempobj != null)
             {
                 sb.AppendLine($"Current directory: {tempobj.GetDirectory()}"); // Текущая дериктория.

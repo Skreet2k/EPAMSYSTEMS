@@ -1,22 +1,14 @@
 ﻿using System;
-using System.Diagnostics;
-using Data;
-using Services;
-using ServicesImpl;
 
 namespace Server
 {
     internal class Program
     {
-        private static void Main()
+        public static void Main()
         {
-            Console.WriteLine();
-            // //ТЕСТИРОВАНИЕ РЕАЛИЗАЦИИ СЕРВИСА.
-            var lfsd = new LocalFileSystemData();
-            var lfs = lfsd.Load(@"LFSDate.dat") as LocalFileSystem;          
+            var server = new Server("127.0.0.1", 13000); //Создание сервера
+            server.Start(); //Запуск сервера   
 
-            ConsoleInterface.Show(lfs);
-            Console.ReadLine();
         }
     }
 }

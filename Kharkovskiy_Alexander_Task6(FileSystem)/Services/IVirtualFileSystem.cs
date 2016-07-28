@@ -13,7 +13,7 @@ namespace Services
         /// <param name="name">Имя объекта.</param>
         /// <param name="type">Тип объекта, наследник от FileSystem.</param>
         /// <param name="path">Путь к папке-родителю.</param>
-        void Create(string name, Type type, string path);
+        void Create(string name, string type, string path);
         /// <summary>
         /// Копирование объекта файловой системы.
         /// </summary>

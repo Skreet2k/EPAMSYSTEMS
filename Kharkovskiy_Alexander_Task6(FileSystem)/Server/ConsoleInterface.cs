@@ -116,7 +116,7 @@ namespace Server
         /// </summary>
         private static void Exit()
         {
-            new LocalFileSystemData().Safe(_lfs, @"LFSDate.dat");
+            new LocalFileSystemData().Safe(_lfs, @"LFSData.dat");
             Environment.Exit(0);
         }
         /// <summary>
@@ -132,11 +132,11 @@ namespace Server
             switch (_commandArray[1])
             {
                 case "file":
-                    _lfs.Create(Name(2),typeof(File),_currentPath);
+                    _lfs.Create(Name(2),typeof(File).AssemblyQualifiedName,_currentPath);
                     _lastMessage = "";
                     return;
                 case "folder":
-                    _lfs.Create(Name(2), typeof(Folder), _currentPath);
+                    _lfs.Create(Name(2), typeof(Folder).AssemblyQualifiedName, _currentPath);
                     _lastMessage = "";
                     return;
                 default:

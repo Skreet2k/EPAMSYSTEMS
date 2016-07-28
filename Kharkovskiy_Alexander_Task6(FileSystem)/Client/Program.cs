@@ -1,15 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Net.Sockets;
 using System.Text;
-using System.Threading.Tasks;
+using Services;
 
 namespace Client
 {
-    class Program
-    {
-        static void Main(string[] args)
+    internal class Program
+    {       
+        private static void Main(string[] args)
         {
+            var rfs = new RemoteFileSystem();
+            rfs.Create("TestClient", typeof(Folder).AssemblyQualifiedName, @"root:\");
+            rfs.Copy("TestClient", @"root:\", @"root:\");
+            rfs.Remove("TestClient", @"root:\");
+            rfs.GetDirectoryThree(@"root:\");
+            Console.ReadLine();
         }
     }
 }

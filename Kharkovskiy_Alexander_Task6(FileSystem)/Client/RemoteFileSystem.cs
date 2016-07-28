@@ -1,46 +1,140 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
+using System.IO;
+using System.Xml.Serialization;
+
 
 namespace Client
 {
-    class RemoteFileSystem: Services.IVirtualFileSystem
+    /// <summary>
+    /// Удаленная файловая система.
+    /// </summary>
+    public class RemoteFileSystem: Services.IVirtualFileSystem
     {
-        public void Create(string name, Type type, string path)
+        private readonly Connect _connect;
+        /// <summary>
+        /// Конструктор по умолчанию. Создает экземпляр класса Connect с полями из ConnectData.
+        /// </summary>
+        public RemoteFileSystem()
         {
-            throw new NotImplementedException();
-        }
+            var config = ConfigurationManager.GetSection("ConnectData") as ConnectConfigSection;
+            if(config == null)
+                throw new NullReferenceException("Config section 'ConnectData' not found.");
+            _connect = new Connect(config.ServerAdress, config.Port);
 
+        }
+        /// <summary>
+        /// Создание объекта файловой системы.
+        /// </summary>
+        /// <param name="name">Имя объекта.</param>
+        /// <param name="type">Тип объекта, наследник от FsElement.</param>
+        /// <param name="path">Путь к папке-родителю.</param>
+        public void Create(string name, string type, string path)
+        {
+            using (var stream = new MemoryStream()) // Каждый метод создает подключение к серверу и отправляет XML файл с запросом.
+            {
+                var command = new List <object> { "Create",name,Type.GetType(type).AssemblyQualifiedName,path};
+                var ser = new XmlSerializer(command.GetType());
+                ser.Serialize(stream, command);
+                _connect.SendData(stream.ToArray());               
+            }         
+        }
+        /// <summary>
+        /// Копирование объекта файловой системы.
+        /// </summary>
+        /// <param name="name">Имя объекта.</param>
+        /// <param name="soursePath">Путь до папки-родителя.</param>
+        /// <param name="destinationPath">Путь до папки-родителя.</param>
         public void Copy(string name, string soursePath, string destinationPath)
         {
-            throw new NotImplementedException();
+            using (var stream = new MemoryStream())
+            {
+                var command = new List<object>() { "Copy", name, soursePath, destinationPath };
+                var ser = new XmlSerializer(command.GetType());
+                ser.Serialize(stream, command);
+                _connect.SendData(stream.ToArray());
+            }
         }
-
+        /// <summary>
+        /// Перемещение объекта файловой системы.
+        /// </summary>
+        /// <param name="name">Имя объекта.</param>
+        /// <param name="soursePath">Путь до папки-родителя.</param>
+        /// <param name="destinationPath">Путь до папки-родителя.</param>
         public void Move(string name, string soursePath, string destinationPath)
         {
-            throw new NotImplementedException();
+            using (var stream = new MemoryStream())
+            {
+                var command = new List<object>() { "Move", name, soursePath, destinationPath };
+                var ser = new XmlSerializer(command.GetType());
+                ser.Serialize(stream, command);
+                _connect.SendData(stream.ToArray());
+            }
         }
-
+        /// <summary>
+        /// Удаление объекта файловой системы.
+        /// </summary>
+        /// <param name="name">Имя объекта.</param>
+        /// <param name="path">Путь до папки-родителя.</param>
         public void Remove(string name, string path)
         {
-            throw new NotImplementedException();
+            using (var stream = new MemoryStream())
+            {
+                var command = new List<object>() { "Remove", name, path};
+                var ser = new XmlSerializer(command.GetType());
+                ser.Serialize(stream, command);
+                _connect.SendData(stream.ToArray());
+            }
         }
-
+        /// <summary>
+        /// Переименование объекта.
+        /// </summary>
+        /// <param name="name">Имя объекта.</param>
+        /// <param name="path">Путь до объекта.</param>
+        /// <param name="newname">Новое имя объекта.</param>
         public void Rename(string name, string path, string newname)
         {
-            throw new NotImplementedException();
+            using (var stream = new MemoryStream())
+            {
+                var command = new List<object>() { "Rename", name, path, newname };
+                var ser = new XmlSerializer(command.GetType());
+                ser.Serialize(stream, command);
+                _connect.SendData(stream.ToArray());
+            }
         }
-
+        /// <summary>
+        /// Строковое представление папки.
+        /// </summary>
+        /// <param name="path">Путь до папки.</param>
         public string GetDirectoryThree(string path)
         {
-            throw new NotImplementedException();
+            using (var stream = new MemoryStream())
+            {
+                var command = new List<object>() { "GetDirectoryThree", path };
+                var ser = new XmlSerializer(command.GetType());
+                ser.Serialize(stream, command);
+                return _connect.SendData(stream.ToArray());
+            }
         }
-
+        /// <summary>
+        /// Изменение атрибутов объекта.
+        /// </summary>
+        /// <param name="name">Имя объекта.</param>
+        /// <param name="path">Путь до папки-родителя.</param>
+        /// <param name="isArchive">Архивный.</param>
+        /// <param name="isHidden">Скрытый.</param>
+        /// <param name="isReadOnly">Только для чтения.</param>
+        /// <param name="isSystem">Системный.</param>
         public void SetAttributes(string name, string path, bool isArchive, bool isHidden, bool isReadOnly, bool isSystem)
         {
-            throw new NotImplementedException();
-        }
+            using (var stream = new MemoryStream())
+            {
+                var command = new List<object>() { "SetAttributes", name, path, isArchive, isHidden, isReadOnly, isSystem };
+                var ser = new XmlSerializer(command.GetType());
+                ser.Serialize(stream, command);
+                _connect.SendData(stream.ToArray());
+            }
+        }       
     }
 }
