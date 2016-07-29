@@ -13,17 +13,22 @@ namespace Kharkovskiy_Alexander_Task8_Expression_
         {
             if (b.NodeType == ExpressionType.Add)
             {
-                var left = Visit(b.Left);
-                var right = Visit(b.Right);
                 {
-                    int temp;
-                    if (int.TryParse(right.ToString(), out temp) && temp == 1)
-                    { 
-                        return Expression.MakeUnary(ExpressionType.Increment, left, b.Type, b.Method);
-                    }
-                    if (int.TryParse(left.ToString(), out temp) && temp == 1)
+                    if (b.Right.NodeType == ExpressionType.Constant)
                     {
-                        return Expression.MakeUnary(ExpressionType.Increment, right, b.Type, b.Method);
+                        if ((int)((ConstantExpression)b.Right).Value == 1)
+                        {
+                            return Expression.MakeUnary(ExpressionType.Increment, b.Left, b.Type, b.Method);
+                            
+                        }
+                    }
+                    
+                    if (b.Left.NodeType == ExpressionType.Constant)
+                    {
+                        if ((int)((ConstantExpression)b.Left).Value == 1)
+                        {
+                            return Expression.MakeUnary(ExpressionType.Increment, b.Right, b.Type, b.Method);
+                        }
                     }
                 }
             }

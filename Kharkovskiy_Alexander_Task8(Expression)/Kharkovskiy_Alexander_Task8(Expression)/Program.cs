@@ -21,10 +21,14 @@ namespace Kharkovskiy_Alexander_Task8_Expression_
             var modifiedExpr2 = treeModifier.Modify(expr2);
             Console.WriteLine($"{modifiedExpr2} при b = 5 дал результат: {expr2.Compile().Invoke(5)}");
 
+            var a1 = Expression.Parameter(typeof(double), "a");
+            var b1 = Expression.Parameter(typeof(double), "b");
             // Формула для подсчета среднего двух чисел:
-            Expression<Func<int, int, double>> expr3 = (a, b) => (a + b)/2.0;
-            Console.WriteLine($"{expr3} при a = 5 и b = 6 дал результат: {expr3.Compile().Invoke(5,6)}");
-           
+            var expr3 = Expression.Lambda(
+                Expression.Divide(
+                    Expression.Add(a1, b1),
+                    Expression.Constant(2.0)), a1, b1);
+            Console.WriteLine($"{expr3} при a = 5 и b = 6 дал результат: {expr3.Compile().DynamicInvoke(5, 6)}");
             Console.Read();
         }
     }
