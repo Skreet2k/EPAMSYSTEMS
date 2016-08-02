@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Services
 {
@@ -36,5 +37,6 @@ namespace Services
         public Folder(string name) : base(name)
         {           
         }
+        public Folder() { }
     }
 }

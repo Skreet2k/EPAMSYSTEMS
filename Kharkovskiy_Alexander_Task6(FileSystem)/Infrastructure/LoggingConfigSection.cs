@@ -1,6 +1,6 @@
 ﻿using System.Configuration;
 
-namespace Infrastructure.LoggingToDB
+namespace Infrastructure
 {
     public class LoggingConfigSection : ConfigurationSection
     {
@@ -11,6 +11,15 @@ namespace Infrastructure.LoggingToDB
             {
                 var str = (base["messageBufferSize"]).ToString();
                 return int.Parse(str);
+            }
+        }
+
+        [ConfigurationProperty("tableName")]
+        public string TableName
+        {
+            get
+            {
+                return (base["tableName"]).ToString();
             }
         }
 

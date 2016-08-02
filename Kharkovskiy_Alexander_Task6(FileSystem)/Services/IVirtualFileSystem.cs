@@ -10,10 +10,9 @@ namespace Services
         /// <summary>
         /// Создание объекта файловой системы.
         /// </summary>
-        /// <param name="name">Имя объекта.</param>
-        /// <param name="type">Тип объекта, наследник от FileSystem.</param>
+        /// <param name="fsElement">Экземпляр наследника от FsElement.</param>
         /// <param name="path">Путь к папке-родителю.</param>
-        void Create(string name, string type, string path);
+        void Create(FsElement fsElement, string path);
         /// <summary>
         /// Копирование объекта файловой системы.
         /// </summary>

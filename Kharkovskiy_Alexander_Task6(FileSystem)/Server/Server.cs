@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Xml.Serialization;
 using Data;
-using Services;
+using Infrastructure;
 using ServicesImpl;
 
 namespace Server
@@ -15,15 +18,19 @@ namespace Server
     {
         private readonly string _serverAdress;
         private readonly int _port;
-        /// <summary>
-        /// Создание сервера.
-        /// </summary>
-        /// <param name="serverAdress">IP-адрес сервера.</param>
-        /// <param name="port">Порт сервера.</param>
-        public Server(string serverAdress, int port)
+        public Server()
         {
-            _serverAdress = serverAdress;
-            _port = port;
+            try
+            {
+                var config = ConfigurationManager.GetSection("serverSetting") as ServerConfigSection;
+                _serverAdress = config.IpAdress;
+                _port = config.Port;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"Ошибка при получении данных из конфиг секции 'serverSetting'. {ex.Message}", "Information");
+                throw;
+            }
         }
         /// <summary>
         /// Запуск сервера.
@@ -35,30 +42,30 @@ namespace Server
             {
                 server = new TcpListener(IPAddress.Parse(_serverAdress), _port);
                 server.Start();
-                var bytes = new byte[512];
-                Console.WriteLine($"Сервер {_serverAdress}:{_port} запущен!");
+                var bytes = new byte[2048];
+                Trace.WriteLine($"Сервер {_serverAdress}:{_port} запущен!", "Information");
                 while (true)
                 {
-                    Console.Write("Ожидаем подключения... ");
+                    Trace.WriteLine("Ожидаем подключения... ", "Information");
                     var client = server.AcceptTcpClient();
-                    Console.Write("Клиент подключился!");
+                    Trace.WriteLine("Клиент подключился!", "Information");
                     var stream = client.GetStream();
                     int i;
                     while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                     {
-                        var data = Encoding.ASCII.GetString(bytes, 0, i);
-                        Console.WriteLine($"Получена информация:\n{data}");
+                         var data = Encoding.Default.GetString(bytes, 0, i);
+                        Trace.WriteLine($"Получена информация:\n{data}", "Information");
                         data = ProcessingData(data);
-                        var msg = System.Text.Encoding.ASCII.GetBytes(data);
+                        var msg = Encoding.Default.GetBytes(data);
                         stream.Write(msg, 0, msg.Length);
-                        Console.WriteLine($"Отправили клиенту: {data}");
+                        Trace.WriteLine($"Отправили клиенту: {data}", "Information");
                     }
                     client.Close();
                 }
             }
             catch (SocketException e)
             {
-                Console.WriteLine($"SocketException: {e}");
+                Trace.WriteLine($"SocketException: {e}", "Information");
             }
             finally
             {
@@ -70,9 +77,9 @@ namespace Server
         {
             try
             {
-                var stream = new MemoryStream(Encoding.ASCII.GetBytes(data));
+                var stream = new MemoryStream(Encoding.Default.GetBytes(data));
                 var lfs = new LocalFileSystemData().Load(@"LFSData.dat") as LocalFileSystem;
-                var ser = new XmlSerializer(typeof(List<object>));
+                var ser = new BinaryFormatter();
                 var array = ser.Deserialize(stream) as List<object>;
                 object returnMethod = "";
                 if (array != null)

@@ -26,5 +26,6 @@ namespace Services
         public File(string name, string path, Attributes attributes) : base(name, path, attributes)
         {
         }
+        public File() { }
     }
 }

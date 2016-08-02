@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Server
 {
@@ -6,7 +7,7 @@ namespace Server
     {
         public static void Main()
         {
-            var server = new Server("127.0.0.1", 13000); //Создание сервера
+            var server = new Server();
             server.Start(); //Запуск сервера   
 
         }

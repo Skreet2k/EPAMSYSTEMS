@@ -56,9 +56,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="LoggingToDB\DbTraceListener.cs" />
-    <Compile Include="LoggingToDB\LoggingConfigSection.cs" />
+    <Compile Include="DbTraceListener.cs" />
+    <Compile Include="LoggingConfigSection.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ServerConfigSection.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Json;
 using System.Text;
 
 
@@ -10,7 +12,7 @@ namespace Services
     /// Файловая система. Базовый класс.
     /// </summary>
     [Serializable]
-    public class  FsElement
+    public abstract class FsElement
     {
         private string _name;
         /// <summary>
@@ -21,7 +23,7 @@ namespace Services
         /// Создание файловой системы с помощью уже созданной/наполенной коревой папки.
         /// </summary>
         /// <param name="rootFolder">Корневая папка.</param>
-        public FsElement(Folder rootFolder)
+        protected FsElement(Folder rootFolder)
         {
             RootFolder = rootFolder;
         }
@@ -31,7 +33,7 @@ namespace Services
         /// <param name="name">Имя. Может принимать null или пустую строку.</param>
         /// <param name="parentFolder">Папка-родитель. Может принимать null.</param>
         /// <param name="attributes">Атрибуты. Может принимать null.</param>
-        public FsElement(string name, Folder parentFolder, Attributes attributes)
+        protected FsElement(string name, Folder parentFolder, Attributes attributes)
         {
             if (parentFolder == null)
             {
@@ -58,7 +60,7 @@ namespace Services
         /// <param name="name">Имя. Может принимать null или пустую строку.</param>
         /// <param name="path">Путь до папки-родителя. Может начинаться с 'root:\' или '\'.</param>
         /// <param name="attributes">Атрибуты. Может принмать null.</param>
-        public FsElement(string name, string path, Attributes attributes):this(name: name, parentFolder: null, attributes: attributes)
+        protected FsElement(string name, string path, Attributes attributes):this(name: name, parentFolder: null, attributes: attributes)
         {
             ParentFolder = ParsePath(path, RootFolder) ?? RootFolder;
         }
@@ -77,11 +79,11 @@ namespace Services
         /// <summary>
         /// Дата создания.
         /// </summary>
-        public DateTime DateOfCreate { get; private set; }
+        public DateTime DateOfCreate { get; set; }
         /// <summary>
         /// Дата изменения.
         /// </summary>
-        public DateTime DateOfChange { get; private set; }
+        public DateTime DateOfChange { get; set; }
         /// <summary>
         /// Имя. Сетер парсится. Автоматическое исправление имени.
         /// </summary>
@@ -178,5 +180,6 @@ namespace Services
             if (string.IsNullOrWhiteSpace(arrayPath?[0])) return folder;
             return arrayPath.Aggregate(folder, (current, s) => current?.Nested.FirstOrDefault(x => x.Name == s) as Folder);
         }
+        protected FsElement() { }
     }
 }

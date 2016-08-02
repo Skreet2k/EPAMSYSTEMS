@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
-using System.Xml.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using Services;
 
 
 namespace Client
@@ -27,16 +28,15 @@ namespace Client
         /// <summary>
         /// Создание объекта файловой системы.
         /// </summary>
-        /// <param name="name">Имя объекта.</param>
-        /// <param name="type">Тип объекта, наследник от FsElement.</param>
+        /// <param name="fsElement">Экземпляр наследника от FsElement.</param>
         /// <param name="path">Путь к папке-родителю.</param>
-        public void Create(string name, string type, string path)
+        public void Create(FsElement fsElement, string path)
         {
             using (var stream = new MemoryStream()) // Каждый метод создает подключение к серверу и отправляет XML файл с запросом.
             {
-                var command = new List <object> { "Create",name,Type.GetType(type).AssemblyQualifiedName,path};
-                var ser = new XmlSerializer(command.GetType());
-                ser.Serialize(stream, command);
+                var command =  new List<object> { "Create", fsElement , path};
+                var ser = new BinaryFormatter();
+                ser.Serialize(stream, command);           
                 _connect.SendData(stream.ToArray());               
             }         
         }
@@ -51,7 +51,7 @@ namespace Client
             using (var stream = new MemoryStream())
             {
                 var command = new List<object>() { "Copy", name, soursePath, destinationPath };
-                var ser = new XmlSerializer(command.GetType());
+                var ser = new BinaryFormatter();
                 ser.Serialize(stream, command);
                 _connect.SendData(stream.ToArray());
             }
@@ -67,7 +67,7 @@ namespace Client
             using (var stream = new MemoryStream())
             {
                 var command = new List<object>() { "Move", name, soursePath, destinationPath };
-                var ser = new XmlSerializer(command.GetType());
+                var ser = new BinaryFormatter();
                 ser.Serialize(stream, command);
                 _connect.SendData(stream.ToArray());
             }
@@ -82,7 +82,7 @@ namespace Client
             using (var stream = new MemoryStream())
             {
                 var command = new List<object>() { "Remove", name, path};
-                var ser = new XmlSerializer(command.GetType());
+                var ser = new BinaryFormatter();
                 ser.Serialize(stream, command);
                 _connect.SendData(stream.ToArray());
             }
@@ -98,7 +98,7 @@ namespace Client
             using (var stream = new MemoryStream())
             {
                 var command = new List<object>() { "Rename", name, path, newname };
-                var ser = new XmlSerializer(command.GetType());
+                var ser = new BinaryFormatter();
                 ser.Serialize(stream, command);
                 _connect.SendData(stream.ToArray());
             }
@@ -112,7 +112,7 @@ namespace Client
             using (var stream = new MemoryStream())
             {
                 var command = new List<object>() { "GetDirectoryThree", path };
-                var ser = new XmlSerializer(command.GetType());
+                var ser = new BinaryFormatter();
                 ser.Serialize(stream, command);
                 return _connect.SendData(stream.ToArray());
             }
@@ -131,10 +131,10 @@ namespace Client
             using (var stream = new MemoryStream())
             {
                 var command = new List<object>() { "SetAttributes", name, path, isArchive, isHidden, isReadOnly, isSystem };
-                var ser = new XmlSerializer(command.GetType());
+                var ser = new BinaryFormatter();
                 ser.Serialize(stream, command);
                 _connect.SendData(stream.ToArray());
             }
-        }       
+        }            
     }
 }

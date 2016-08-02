@@ -10,7 +10,7 @@ namespace Client
         private static void Main(string[] args)
         {
             var rfs = new RemoteFileSystem();
-            rfs.Create("TestClient", typeof(Folder).AssemblyQualifiedName, @"root:\");
+            rfs.Create(new Folder("theName"), @"root:\");
             rfs.Remove("TestClient", @"root:\");
             rfs.GetDirectoryThree(@"root:\");
             Console.ReadLine();

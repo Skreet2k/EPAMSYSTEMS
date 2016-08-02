@@ -132,11 +132,11 @@ namespace Server
             switch (_commandArray[1])
             {
                 case "file":
-                    _lfs.Create(Name(2),typeof(File).AssemblyQualifiedName,_currentPath);
+                    _lfs.Create(new File(Name(2),_currentPath,null), _currentPath);
                     _lastMessage = "";
                     return;
                 case "folder":
-                    _lfs.Create(Name(2), typeof(Folder).AssemblyQualifiedName, _currentPath);
+                    _lfs.Create(new Folder(Name(2), _currentPath, null), _currentPath);
                     _lastMessage = "";
                     return;
                 default:

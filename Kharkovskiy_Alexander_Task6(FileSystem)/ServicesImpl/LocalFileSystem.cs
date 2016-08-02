@@ -18,24 +18,22 @@ namespace ServicesImpl
         /// <summary>
         /// Создание объекта файловой системы.
         /// </summary>
-        /// <param name="name">Имя объекта.</param>
-        /// <param name="type">Тип объекта, наследник от FsElement.</param>
+        /// <param name="fsElement">Экземпляр наследника от FsElement.</param>
         /// <param name="path">Путь к папке-родителю.</param>
-        public void Create(string name, string type, string path)
+        public void Create(FsElement fsElement, string path)
         {
-            if (Type.GetType(type) == typeof(File))
+            try
             {
-                var newobj = new File(name, RootFolder.ParsePath(path, RootFolder), null);
-                Trace.TraceInformation($"File '{newobj.Name}' was created in directory '{newobj.GetDirectory()}'.");
-                return;
+                fsElement.ParentFolder = RootFolder.ParsePath(path, RootFolder);
+                RootFolder.ParsePath(path, RootFolder).Nested.Add(fsElement);
+                Trace.TraceInformation($"Object '{fsElement.GetType().Name}' with name '{fsElement.Name}' was created in directory '{fsElement.GetDirectory()}'.");
+
             }
-            if (Type.GetType(type) == typeof(Folder))
+            catch (Exception)
             {
-                var newobj = new Folder(name, RootFolder.ParsePath(path, RootFolder), null);
-                Trace.TraceInformation($"Folder '{newobj.Name}' was created in directory '{newobj.GetDirectory()}'.");
-                return;
+               Trace.TraceError($"Create error. Object '{fsElement.GetType().Name}' with name '{fsElement.Name}' in directory '{path}' not created.");
             }
-            Trace.TraceError($"Create error. Object '{type}' with name '{name}' in directory '{path}' not created.");
+
         }
         /// <summary>
         /// Копирование объекта файловой системы.
@@ -48,7 +46,7 @@ namespace ServicesImpl
             var tempobj = RootFolder.ParsePath(soursePath, RootFolder)?.Nested.FirstOrDefault(x => x.Name == name);
             if (tempobj != null)
             {
-                Create(tempobj.Name, tempobj.GetType().AssemblyQualifiedName, destinationPath);
+                Create(tempobj, destinationPath);
                     Trace.TraceInformation($"{tempobj.GetType().Name} '{name}' was copy from '{tempobj.GetDirectory()}' to '{destinationPath}'");
                 return;
             }
