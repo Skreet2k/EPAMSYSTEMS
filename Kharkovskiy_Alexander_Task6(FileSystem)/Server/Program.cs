@@ -1,7 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-
-namespace Server
+﻿namespace Server
 {
     internal class Program
     {

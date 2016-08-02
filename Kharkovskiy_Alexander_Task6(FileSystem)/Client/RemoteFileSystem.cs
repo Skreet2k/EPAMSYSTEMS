@@ -11,7 +11,7 @@ namespace Client
     /// <summary>
     /// Удаленная файловая система.
     /// </summary>
-    public class RemoteFileSystem: Services.IVirtualFileSystem
+    public class RemoteFileSystem: IVirtualFileSystem
     {
         private readonly Connect _connect;
         /// <summary>
