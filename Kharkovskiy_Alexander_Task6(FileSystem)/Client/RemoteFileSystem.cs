@@ -32,7 +32,7 @@ namespace Client
         /// <param name="path">Путь к папке-родителю.</param>
         public void Create(FsElement fsElement, string path)
         {
-            using (var stream = new MemoryStream()) // Каждый метод создает подключение к серверу и отправляет XML файл с запросом.
+            using (var stream = new MemoryStream()) // Каждый метод создает подключение к серверу и отправляет Binary файл с запросом.
             {
                 var command =  new List<object> { "Create", fsElement , path};
                 var ser = new BinaryFormatter();
