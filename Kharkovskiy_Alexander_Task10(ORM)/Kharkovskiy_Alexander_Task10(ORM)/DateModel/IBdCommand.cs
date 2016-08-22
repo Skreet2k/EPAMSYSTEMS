@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace Kharkovskiy_Alexander_Task10_ORM_.BDAcsess
 {
-public interface IBdCommand
-{
-    TableModel Select(string tableName);
-    int Insert(string tableName, string columns, string values);
-    }
+//public interface IBdCommand
+//{
+//    TableModel Select(string tableName);
+//    int Insert(string tableName, string columns, string values);
+//    }
+//}
 }

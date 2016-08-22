@@ -10,7 +10,7 @@
 
 #pragma warning disable 1591
 
-namespace Kharkovskiy_Alexander_Task10_ORM_ {
+namespace OrmUser {
     
     
     /// <summary>
